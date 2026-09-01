@@ -86,8 +86,9 @@ test('has no remote frontend dependencies', () => {
 test('README links to the public display page', () => {
   assert.match(
     readme,
-    /https:\/\/wishyouerehere9610\.github\.io\/ontology-in-practice-pages\//,
+    /https:\/\/wishyouerehere9610\.github\.io\/ontology-in-practice\//,
   );
+  assert.doesNotMatch(readme, /ontology-in-practice-pages/);
 });
 
 test('includes accessibility and reduced-motion safeguards', () => {
