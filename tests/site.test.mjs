@@ -83,6 +83,13 @@ test('has no remote frontend dependencies', () => {
   assert.doesNotMatch(html, /@import\s+url/i);
 });
 
+test('README links to the public display page', () => {
+  assert.match(
+    readme,
+    /https:\/\/wishyouerehere9610\.github\.io\/ontology-in-practice-pages\//,
+  );
+});
+
 test('includes accessibility and reduced-motion safeguards', () => {
   assert.match(html, /href="#main-content"/i);
   assert.match(html, /<main[^>]+id="main-content"/i);

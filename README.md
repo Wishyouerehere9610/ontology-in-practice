@@ -4,6 +4,8 @@
 
 项目回答一个具体问题：如何把散落在数据库、表格、PDF 和业务系统里的信息，变成 AI 能理解、查询、计算和受控执行的业务操作层。
 
+[在线阅读](https://wishyouerehere9610.github.io/ontology-in-practice-pages/)
+
 ## 内容地图
 
 - 为什么仅有 RAG 仍会得到不稳定的业务答案
