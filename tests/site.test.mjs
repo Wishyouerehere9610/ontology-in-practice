@@ -172,7 +172,7 @@ test('covers topics recovered from the full transcript and manuscript frames', (
     'Source System Mappings',
     'Customer Extensions',
     '全链路追溯',
-    '隔离写回',
+    '受控写回',
     '应用直接消费',
     'Update Application Variable',
     'Command Tool',

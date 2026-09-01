@@ -1476,7 +1476,7 @@
       </section>
 
       <section class="content-section" id="pipeline">
-        <p class="section-kicker">04 / Data pipeline</p>
+        <p class="section-kicker">05 / Data pipeline</p>
         <h2>从原始文件到 Ontology，中间不能省</h2>
         <p class="lead">
           现实中的输入有 CSV、嵌套 JSON、数据库宽表、扫描 PDF 和手写记录。它们不会直接变成业务对象。真正费时间的部分，是接入、保留原始证据、解析、清洗和映射。
@@ -1542,6 +1542,30 @@
           <p>结构化后的每一行都应继续指向原始 PDF、图片或音频。当审计人问“这个结论从哪里来”时，系统可以回到原始页和原始版本。</p>
         </div>
 
+        <h3>数据进入本体前，还要过四道治理门</h3>
+        <div class="operating-grid">
+          <article class="operating-card">
+            <span class="mono">Entity Resolution</span>
+            <h3>实体消歧</h3>
+            <p>统一跨系统稳定标识、别名和合并规则。合同中的“甲公司”和 ERP 中的供应商编码必须能回到同一个业务对象。</p>
+          </article>
+          <article class="operating-card">
+            <span class="mono">Source Precedence</span>
+            <h3>来源优先级</h3>
+            <p>主数据、合同、业务单据和人工录入发生冲突时，系统要知道以谁为准，并保留被覆盖的事实。</p>
+          </article>
+          <article class="operating-card">
+            <span class="mono">Temporal Semantics</span>
+            <h3>时间语义</h3>
+            <p>区分业务发生时间、生效时间、系统入库时间和失效时间，避免用今天的口径解释昨天的业务。</p>
+          </article>
+          <article class="operating-card">
+            <span class="mono">Confidence and Review</span>
+            <h3>不确定事实隔离</h3>
+            <p>OCR 和模型抽取结果携带置信度与证据指针。未通过复核门槛的字段不能直接进入确定性规则。</p>
+          </article>
+        </div>
+
         <h3>增量更新要同时贯通三层</h3>
         <div class="incremental">
           <div><strong>Source sync</strong><p>只拉取新增和已变更的数据。</p></div>
@@ -1561,13 +1585,13 @@
         <h3>Ontology 相比数据库 Schema 多出三项能力</h3>
         <div class="decision-rule">
           <div><strong>全链路追溯</strong>从对象与属性回到干净表、变换步骤和原始文件。</div>
-          <div><strong>隔离写回</strong>Action 的变更写入独立记录，保留原始数据，同时支持审计和回放。</div>
+          <div><strong>受控写回</strong>推荐把 Action 请求、审批和结果写入独立记录，再由连接器更新事实源。这是一种生产架构模式，不是 Ontology 固有能力。</div>
           <div><strong>应用直接消费</strong>Agent 和业务应用面向对象、关系、函数和动作，不需要每个场景重写一套底层表 API。</div>
         </div>
       </section>
 
       <section class="content-section" id="operating-layer">
-        <p class="section-kicker">05 / Operational layer</p>
+        <p class="section-kicker">06 / Operational layer</p>
         <h2>把“查数据”升级为“做业务”</h2>
         <p class="lead">
           一张干净表可以映射为一种 Object Type，每行是一个 Object，每列是 Property，表与表的关联是 Link。这一层能让系统看懂业务世界。Function 和 Action 则让系统可以计算并作用于这个世界。
@@ -1586,8 +1610,8 @@
           </article>
           <article class="operating-card">
             <span class="mono">03 / Function</span>
-            <h3>确定性业务计算</h3>
-            <p>延误风险应由函数读取 90 天历史、承运商履约率和天气，而不是让 LLM 凭感觉判断。</p>
+            <h3>专业业务计算</h3>
+            <p>延误风险应由版本化函数读取历史、承运商履约率和天气，而不是让 LLM 凭感觉判断。函数是否确定，还取决于输入与依赖。</p>
           </article>
           <article class="operating-card">
             <span class="mono">04 / Action</span>
@@ -1601,6 +1625,32 @@
           <p>专业规则、数学计算和约束交给 Function。高风险变更交给带确认的 Action。这样才能把自然语言的灵活性与业务执行的确定性分开。</p>
         </div>
 
+        <h3 style="margin-top: 34px;">Function 要按依赖方式分别治理</h3>
+        <div class="data-paths">
+          <article class="card">
+            <span class="card-label">Pure Function</span>
+            <h3>固定输入，稳定输出</h3>
+            <p>计算公式、规则和输入版本固定时可以直接回归。发布时记录函数版本、测试样本和缺失数据处理。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">Model Function</span>
+            <h3>带模型的不确定计算</h3>
+            <p>记录模型、Prompt、上下文和评测版本。即使接口叫 Function，也不能把模型推断当成绝对确定结果。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">External Function</span>
+            <h3>依赖外部服务</h3>
+            <p>天气、价格和业务 API 可能超时或变化。必须定义重试、降级、返回值校验和缓存边界。</p>
+          </article>
+        </div>
+
+        <h3>Action 不能只定义一个按钮</h3>
+        <div class="decision-rule">
+          <div><strong>执行前</strong>校验身份、对象范围、前置条件、风险等级和审批状态，并生成幂等键。</div>
+          <div><strong>执行中</strong>处理超时、部分失败和重复请求，保留任务检查点，不把未知状态伪装成成功。</div>
+          <div><strong>执行后</strong>回读事实源，记录副作用和审计证据。失败时执行补偿操作或转人工处理。</div>
+        </div>
+
         <h3 style="margin-top: 34px;">Action Layer 还需要三个辅助工具</h3>
         <div class="decision-rule">
           <div><strong>Update Application Variable</strong>Agent 改变 Workshop 或应用页的状态，例如切换仓库范围后联动刷新。</div>
@@ -1610,7 +1660,7 @@
       </section>
 
       <section class="content-section" id="agent-context">
-        <p class="section-kicker">06 / Agent interaction</p>
+        <p class="section-kicker">07 / Agent interaction</p>
         <h2>Context 是必须知道，Query 是允许探索</h2>
         <p class="lead">
           Agent 不应扫描全部 Schema，也不应直连底层数据库。每轮对话先注入已配置的背景，再让 Agent 在授权范围内查询对象和关系。
@@ -1659,12 +1709,12 @@
           <article class="card">
             <span class="card-label">Prompted Tool Calling</span>
             <h3>兼容性优先</h3>
-            <p>工具说明作为 Prompt 的一部分交给模型，适用范围广，但通常一次选择一个工具。</p>
+            <p>工具说明作为 Prompt 的一部分交给模型，适用范围广，但参数约束和返回结构需要由应用自行校验。</p>
           </article>
           <article class="card">
             <span class="card-label">Native Tool Calling</span>
             <h3>性能和 Token 效率优先</h3>
-            <p>使用模型原生工具调用协议，可并行调用多个工具。系统不会把整个 Ontology Schema 塞入 System Prompt，只暴露已配置、已授权且与当前任务相关的能力。</p>
+            <p>模型原生协议通常能提供更清晰的参数 Schema。是否支持多个或并行调用，仍取决于模型和 Runtime。系统只暴露已配置、已授权且与当前任务相关的能力。</p>
           </article>
         </div>
 
@@ -1679,7 +1729,7 @@
       </section>
 
       <section class="content-section" id="governance">
-        <p class="section-kicker">07 / Governance</p>
+        <p class="section-kicker">08 / Governance</p>
         <h2>防幻觉不是加一句“不要编造”</h2>
         <p class="lead">
           对于企业 Agent，更可靠的办法是从结构上限制它能看到什么、能查什么、能调什么函数、能执行哪些动作。没有财务对象、没有财务权限、也没有相关函数时，Agent 应该根本接触不到营收数据。
@@ -1710,7 +1760,14 @@
 
         <div class="guardrail">
           <strong>最小权限要同时作用于数据、查询、函数和 Action。</strong>
-          <p>每次调用记录谁在什么时间查了哪些对象、调用了什么函数、请求了什么 Action、用户是否确认以及最终结果。</p>
+          <p>身份要从 WorkBuddy 或其他入口透传到查询与执行层。每次调用记录谁在什么时间查了哪些对象、调用了什么函数、请求了什么 Action、用户是否确认以及最终结果。</p>
+        </div>
+
+        <h3 style="margin-top: 34px;">权限不是一个总开关</h3>
+        <div class="decision-rule">
+          <div><strong>对象与字段</strong>同一个用户可能能看订单状态，但不能看成本、利润和个人信息。</div>
+          <div><strong>Function</strong>能读取对象不等于能运行风险模型、价格计算或跨区域聚合。</div>
+          <div><strong>Action</strong>查询权限不能自动升级为写权限。高风险动作还需要审批、额度和责任人。</div>
         </div>
 
         <h3 style="margin-top: 34px;">外部 Agent 接入要分开“改结构”与“做业务”</h3>
@@ -1725,6 +1782,14 @@
             <h3>面向外部业务 Agent</h3>
             <p>在 Application Restrictions 内读取对象、沿关系查询并执行 Action，但不能修改 Object Type 定义。</p>
           </article>
+        </div>
+
+        <h3>结构变化也需要发布流程</h3>
+        <div class="layer-stack">
+          <div class="layer"><b>Owner &amp; Proposal</b><p>每个对象、关系、函数和动作都有负责人。结构修改先形成 Proposal，不直接覆盖生产版本。</p></div>
+          <div class="layer"><b>Review &amp; Compatibility</b><p>评审影响范围，包括映射、查询、Function、Action、应用和历史数据。</p></div>
+          <div class="layer"><b>Migration &amp; Deprecation</b><p>需要迁移时定义双写或兼容窗口。废弃字段先标记，再通知依赖方，最后移除。</p></div>
+          <div class="layer governance"><b>Rollback &amp; Readback</b><p>发布后回读实际版本和运行行为。出现回归时能恢复结构、规则、连接器和配置。</p></div>
         </div>
       </section>
 
