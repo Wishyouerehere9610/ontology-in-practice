@@ -12,12 +12,15 @@ const readme = existsSync(readmePath) ? readFileSync(readmePath, 'utf8') : '';
 const expectedSectionIds = [
   'problem',
   'definition',
+  'selection',
   'routes',
   'pipeline',
   'operating-layer',
   'agent-context',
   'governance',
+  'production',
   'playbook',
+  'sources',
 ];
 
 test('ships a standalone index page', () => {
@@ -58,23 +61,56 @@ test('covers the construction, operation, context, and governance contracts', ()
   }
 });
 
-test('omits source statements and distillation notes from the project', () => {
-  const publicCopy = `${html}\n${readme}`;
-  const removedPhrases = [
-    '来源与声明',
-    '来源和蒸馏方法',
-    '主要素材来自小红书视频',
-    '本项目是学习型蒸馏与工程化重写',
-    'source/distillation-notes.md',
-    'xiaohongshu.com',
+test('publishes visible source boundaries without remote media hotlinks', () => {
+  const requiredSourceUrls = [
+    'https://www.w3.org/TR/owl2-quick-reference/',
+    'https://www.palantir.com/docs/foundry/architecture-center/ontology-system',
+    'https://cloud.tencent.com/document/product/1831/137039',
+    'https://www.flydiy.cn/benchmarks',
   ];
 
-  for (const phrase of removedPhrases) {
-    assert.equal(publicCopy.includes(phrase), false, `must remove: ${phrase}`);
+  for (const url of requiredSourceUrls) {
+    assert.ok(html.includes(url), `missing visible source: ${url}`);
   }
 
   assert.equal(existsSync(sourceNotesPath), false, 'distillation notes should be removed');
   assert.doesNotMatch(html, /<(?:img|video|audio|source)[^>]+(?:src|srcset)="https?:\/\//i);
+});
+
+test('defines architecture choices and production boundaries', () => {
+  const requiredBoundaryTerms = [
+    '语义本体',
+    '知识图谱',
+    '企业操作层',
+    '结构化 RAG',
+    'GraphRAG',
+    'Entity Resolution',
+    'Source Precedence',
+    'Temporal Semantics',
+    'Confidence and Review',
+    'Pure Function',
+    'Model Function',
+    'External Function',
+    '决策正确率',
+    '证据完整率',
+    '人工接管率',
+    'FlyOntOS + WorkBuddy',
+    'Shadow / ALT',
+  ];
+  const evidenceLabels = [
+    '标准定义',
+    '厂商产品语义',
+    '工程建议',
+    '待现场核验',
+  ];
+
+  for (const term of requiredBoundaryTerms) {
+    assert.ok(html.includes(term), `missing production boundary: ${term}`);
+  }
+
+  for (const label of evidenceLabels) {
+    assert.ok(html.includes(label), `missing evidence label: ${label}`);
+  }
 });
 
 test('has no remote frontend dependencies', () => {
