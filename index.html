@@ -87,7 +87,7 @@
 
     .page-shell {
       display: grid;
-      grid-template-columns: 250px minmax(0, 1fr);
+      grid-template-columns: 264px minmax(0, 1fr);
       gap: clamp(44px, 6vw, 96px);
       width: min(1260px, calc(100% - 48px));
       margin: 0 auto;
@@ -136,14 +136,14 @@
     }
 
     .brand strong {
-      font-size: 13px;
+      font-size: 14px;
       letter-spacing: 0.02em;
     }
 
     .brand small {
       margin-top: 1px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 12px;
     }
 
     .side-nav ol {
@@ -154,13 +154,15 @@
 
     .side-nav a {
       display: grid;
-      grid-template-columns: 22px 1fr;
-      gap: 8px;
+      grid-template-columns: 24px 1fr;
+      gap: 10px;
       align-items: center;
-      padding: 8px 9px;
+      padding: 10px 11px;
       color: var(--muted);
       border-radius: 9px;
-      font-size: 12px;
+      font-size: 15px;
+      font-weight: 520;
+      line-height: 1.45;
       text-decoration: none;
       transition: color 160ms ease, background 160ms ease;
     }
@@ -169,13 +171,17 @@
       content: attr(data-index);
       color: var(--line-strong);
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 10px;
+      font-size: 11px;
     }
 
     .side-nav a:hover,
     .side-nav a[aria-current="true"] {
       color: var(--ink);
       background: var(--blue-soft);
+    }
+
+    .side-nav a[aria-current="true"] {
+      font-weight: 650;
     }
 
     main {
@@ -957,6 +963,8 @@
       .side-nav a {
         display: block;
         padding: 7px 10px;
+        font-size: 13px;
+        line-height: 1.35;
         white-space: nowrap;
       }
 

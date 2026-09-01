@@ -91,6 +91,24 @@ test('README links to the public display page', () => {
   assert.doesNotMatch(readme, /ontology-in-practice-pages/);
 });
 
+test('desktop sidebar navigation uses readable typography', () => {
+  assert.match(
+    html,
+    /\.side-nav a\s*\{[^}]*font-size:\s*15px;[^}]*\}/s,
+    'sidebar labels should use 15px desktop text',
+  );
+  assert.match(
+    html,
+    /\.side-nav a::before\s*\{[^}]*font-size:\s*11px;[^}]*\}/s,
+    'sidebar indices should remain legible',
+  );
+  assert.match(
+    html,
+    /\.side-nav a\[aria-current="true"\]\s*\{[^}]*font-weight:\s*650;[^}]*\}/s,
+    'the current section should have stronger emphasis',
+  );
+});
+
 test('includes accessibility and reduced-motion safeguards', () => {
   assert.match(html, /href="#main-content"/i);
   assert.match(html, /<main[^>]+id="main-content"/i);
