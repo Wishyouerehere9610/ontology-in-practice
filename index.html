@@ -1793,8 +1793,70 @@
         </div>
       </section>
 
+      <section class="content-section" id="production">
+        <p class="section-kicker">09 / Production evidence</p>
+        <h2>从 Demo 到生产，要有一条证据链</h2>
+        <p class="lead">
+          演示只能证明关键路径能跑。进入试点前，还要用代表性真实样本验证长尾问题、权限、失败恢复和人工接管。每次改动都要留下可以回放的版本与 Trace。
+        </p>
+
+        <div class="release-loop" aria-label="从基线到生产读回的发布闭环">
+          <div><b>01 / Baseline</b>记录现有人工流程或 Agent 基线。</div>
+          <div><b>02 / Samples</b>准备代表性样本、坏例和边界案例。</div>
+          <div><b>03 / Trace</b>记录解析、查询、函数、工具和决策过程。</div>
+          <div><b>04 / Taxonomy</b>按数据、映射、规则、权限和工具归因失败。</div>
+          <div><b>05 / Candidate</b>生成可比较的候选版本和变更说明。</div>
+          <div><b>06 / Gate</b>用回归集判断是否达到发布门槛。</div>
+          <div><b>07 / Rollout</b>限定用户、数据和自动化范围进行灰度。</div>
+          <div><b>08 / Readback</b>回读实际加载版本、运行结果和回滚状态。</div>
+        </div>
+
+        <h3>三个核心指标必须写清分子和分母</h3>
+        <div class="metric-grid">
+          <article class="metric-card">
+            <strong>决策正确率</strong>
+            <p>正确最终结论数 / 符合评测口径的样本总数。</p>
+          </article>
+          <article class="metric-card">
+            <strong>证据完整率</strong>
+            <p>正确引用证据的结论数 / 应提供证据的结论总数。</p>
+          </article>
+          <article class="metric-card">
+            <strong>人工接管率</strong>
+            <p>需要人工完成的任务数 / 进入试点的任务总数。</p>
+          </article>
+        </div>
+        <p>同时记录端到端延迟、单次任务成本、数据同步新鲜度、工具失败和回滚结果。每个指标都要注明基线、排除项、时间窗口、数据负责人和复盘频率。</p>
+
+        <div class="callout">
+          <span class="evidence-tag advice">工程建议</span>
+          <h3>Shadow / ALT 负责把变化变成可发布证据</h3>
+          <p>用同一批真实样本回放普通 RAG / Skill 基线与 Ontology 增强方案。分别观察场景识别、实体映射、规则命中、证据引用和最终决策，不把端到端分数当成唯一答案。</p>
+        </div>
+
+        <h3>FlyOntOS + WorkBuddy：把宣传拆成验收项</h3>
+        <p>
+          <span class="evidence-tag">厂商产品语义</span>
+          <span class="evidence-tag verify">待现场核验</span>
+          公开页面可以说明产品声称具备哪些能力，但不能替代真实客户数据、运行 Trace、权限配置和发布读回。
+        </p>
+        <div class="table-wrap">
+          <table class="decision-table">
+            <thead><tr><th>能力</th><th>FlyOntOS 待验证点</th><th>腾讯 FDE 交付物</th></tr></thead>
+            <tbody>
+              <tr><td>对象与关系</td><td>本体资产来源、版本、重复项、实体映射与生产复用证据。</td><td>围绕一个真实决策建立最小场景对象模型。</td></tr>
+              <tr><td>规则与推理</td><td>SHACL、SWRL 或函数在真实样本上的命中、误判与解释结果。</td><td>代表性评测集、错误分类和基线对照。</td></tr>
+              <tr><td>Agent 接入</td><td><code>onto_*</code> MCP 工具的参数 Schema、超时、幂等、副作用和返回契约。</td><td>可复用的 WorkBuddy Connector 与工具白名单。</td></tr>
+              <tr><td>权限</td><td>WorkBuddy 身份是否能透传到对象、字段、Function 和 Action。</td><td>最小权限、审批、审计和高风险动作确认方案。</td></tr>
+              <tr><td>生产运行</td><td>数据同步、Trace、失败恢复、版本回滚、告警和事实源回读。</td><td>Shadow / ALT 评测门禁、灰度范围和停止条件。</td></tr>
+              <tr><td>复用</td><td>哪些资产经过多个客户采用，是否缩短后续项目上线周期。</td><td>行业模板、客户扩展点、运行手册和资产收尾清单。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <section class="content-section" id="playbook">
-        <p class="section-kicker">08 / Delivery playbook</p>
+        <p class="section-kicker">10 / Delivery playbook</p>
         <h2>一个可以真正开工的落地清单</h2>
         <p class="lead">
           Ontology 项目不应从“建全公司知识图谱”开始。先选一个决策频率高、数据可取、动作边界清楚的业务问题，再向外扩。
@@ -1807,16 +1869,23 @@
           <li><div><h3>把专业判断写进 Function</h3><p>明确输入、计算方法、输出 Schema、缺失数据处理和回归样本。</p></div></li>
           <li><div><h3>为 Action 设定风险等级</h3><p>高风险操作要展示影响、成本和代替方案，用户确认后再执行。</p></div></li>
           <li><div><h3>用真实记录做端到端验收</h3><p>验证对象映射、关系追溯、函数结果、权限拒绝、确认流程、写回和审计日志。</p></div></li>
+          <li><div><h3>建立发布与回滚门禁</h3><p>候选版本先跑回归和坏例，再限定范围灰度。失败时能够恢复模型、规则、Ontology、连接器和配置。</p></div></li>
+          <li><div><h3>完成采用与资产收尾</h3><p>跟踪目标用户是否持续使用，并区分客户配置、行业扩展和可进入产品基线的稳定共性。</p></div></li>
         </ol>
 
         <h3 style="margin-top: 38px;">Definition of Done</h3>
         <div class="definition-done">
           <div>每个关键字段都能追溯到原始记录。</div>
           <div>实体别名、关系和版本有回归样本。</div>
-          <div>Function 对同一输入给出稳定、可解释结果。</div>
+          <div>Pure Function 对固定输入给出稳定结果；Model 和 External Function 有独立评测与失败处理。</div>
           <div>越权查询在数据层就被拒绝。</div>
           <div>高风险 Action 未确认时不会执行。</div>
           <div>所有查询、函数和变更都能在审计日志中还原。</div>
+          <div>数据同步新鲜度、延迟、成本、工具失败和人工接管可观测。</div>
+          <div>Prompt、模型、Ontology、Function、Action 和连接器都能版本化和回滚。</div>
+          <div>候选版本通过代表性样本与坏例的回归门禁。</div>
+          <div>试点用户持续使用，流程负责人确认业务结果和自动化边界。</div>
+          <div>客户定制、行业模板和公共产品能力有清晰边界。</div>
         </div>
       </section>
 
