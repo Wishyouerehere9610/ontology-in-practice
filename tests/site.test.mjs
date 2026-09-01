@@ -109,6 +109,55 @@ test('desktop sidebar navigation uses readable typography', () => {
   );
 });
 
+test('desktop layout uses the available reading width', () => {
+  assert.match(html, /--content:\s*960px;/);
+  assert.match(
+    html,
+    /\.page-shell\s*\{[^}]*gap:\s*clamp\(24px,\s*3vw,\s*48px\);[^}]*width:\s*min\(1480px,\s*calc\(100% - 48px\)\);/s,
+  );
+});
+
+test('covers topics recovered from the full transcript and manuscript frames', () => {
+  const recoveredTopics = [
+    '人工共创',
+    '更新滞后',
+    '死模型',
+    'NER',
+    'AP 聚类',
+    'RDF/OWL',
+    '数据质量比数据量更重要',
+    'Dataset',
+    'MediaSet',
+    'Snapshot',
+    'Append',
+    'Pipeline Builder',
+    '代码管道',
+    'Domain Object Types',
+    'Source System Mappings',
+    'Customer Extensions',
+    '全链路追溯',
+    '隔离写回',
+    '应用直接消费',
+    'Update Application Variable',
+    'Command Tool',
+    'Request Clarification',
+    'Vector Embedding',
+    '全文模式',
+    'Chunk 模式',
+    'Prompted Tool Calling',
+    'Native Tool Calling',
+    '23 个候选订单',
+    '5 个高风险',
+    '异常 Case',
+    'Palantir MCP',
+    'Ontology MCP',
+  ];
+
+  for (const topic of recoveredTopics) {
+    assert.ok(html.includes(topic), `missing recovered topic: ${topic}`);
+  }
+});
+
 test('includes accessibility and reduced-motion safeguards', () => {
   assert.match(html, /href="#main-content"/i);
   assert.match(html, /<main[^>]+id="main-content"/i);

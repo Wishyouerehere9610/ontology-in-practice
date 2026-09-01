@@ -22,7 +22,7 @@
       --red-soft: #f1dfdc;
       --shadow: 0 18px 48px rgba(24, 35, 31, 0.09);
       --radius: 18px;
-      --content: 820px;
+      --content: 960px;
     }
 
     * {
@@ -88,8 +88,8 @@
     .page-shell {
       display: grid;
       grid-template-columns: 264px minmax(0, 1fr);
-      gap: clamp(44px, 6vw, 96px);
-      width: min(1260px, calc(100% - 48px));
+      gap: clamp(24px, 3vw, 48px);
+      width: min(1480px, calc(100% - 48px));
       margin: 0 auto;
       padding: 32px 0 96px;
     }
@@ -230,7 +230,7 @@
     }
 
     h1 {
-      max-width: 780px;
+      max-width: 920px;
       margin-bottom: 24px;
       font-size: clamp(44px, 7vw, 86px);
       font-weight: 780;
@@ -251,7 +251,7 @@
     }
 
     .hero-deck {
-      max-width: 650px;
+      max-width: 760px;
       margin-bottom: 34px;
       color: #3f4945;
       font-size: clamp(18px, 2vw, 22px);
@@ -289,7 +289,7 @@
     }
 
     .thesis p {
-      max-width: 590px;
+      max-width: 700px;
       margin: 0;
       font-size: clamp(17px, 2vw, 21px);
       line-height: 1.55;
@@ -324,7 +324,7 @@
     }
 
     .lead {
-      max-width: 720px;
+      max-width: 820px;
       margin-bottom: 36px;
       color: #3e4844;
       font-size: 19px;
@@ -1161,7 +1161,7 @@
           RAG 能帮模型找到文字，却不会自动定义供应商是谁、评分怎么算、哪些动作可以执行。Ontology 补的就是这一层。
         </p>
         <div class="hero-meta" aria-label="文档元信息">
-          <span class="chip">10-15 分钟阅读</span>
+          <span class="chip">15-20 分钟阅读</span>
           <span class="chip">适合 FDE / Agent 工程师</span>
           <span class="chip">版本 2026.09</span>
         </div>
@@ -1195,6 +1195,13 @@
         <div class="callout">
           <h3>问题不是“模型没看到数据”</h3>
           <p>真正缺的是业务语义和执行边界。企业需要告诉 AI：有哪些对象，它们如何关联，规则怎么算，什么人能做什么。</p>
+        </div>
+
+        <h3>传统 Ontology 先卡在三类矛盾</h3>
+        <div class="decision-rule">
+          <div><strong>人工共创太慢</strong>知识工程师和领域专家要反复画白板、争论命名和修改层级，整个周期往往以月计。</div>
+          <div><strong>更新滞后于业务</strong>模型定义完成时，产品、流程和数据口径可能已经改变。</div>
+          <div><strong>容易变成死模型</strong>如果没有连到 ERP、POS 等活系统，也没有持续维护机制，Ontology 很快就只剩静态文档。</div>
         </div>
 
         <h3>LLM 建 Ontology 的四道坎</h3>
@@ -1248,19 +1255,19 @@
         <div class="route-list">
           <article class="route recommended">
             <span class="route-number">01</span>
-            <div><h3>拆解流水线</h3><p>实体提取、关系识别、去重、结构校验、逻辑验证和存图分开执行。失败的事实只进日志。</p></div>
+            <div><h3>拆解流水线</h3><p>NER 实体提取、关系识别、去重、结构校验、逻辑验证和存图分开执行。失败的事实只进日志。</p></div>
             <p>工程量最大，可追溯性和稳定性最好。业务专家要定义验证规则。</p>
             <span class="route-fit">生产首选</span>
           </article>
           <article class="route">
             <span class="route-number">02</span>
-            <div><h3>数据聚类</h3><p>先从文档提取名词，再用不需预设类别数量的聚类方法分组，最后让 LLM 命名。</p></div>
+            <div><h3>数据聚类</h3><p>先用 NER 提取名词，Embedding 向量化后进行 AP 聚类，不需预设类别数量，最后让 LLM 命名并补关系。</p></div>
             <p>新领域里很实用，但聚类质量会直接影响实体粒度。</p>
             <span class="route-fit">探索未知领域</span>
           </article>
           <article class="route">
             <span class="route-number">03</span>
-            <div><h3>人机协同两步法</h3><p>LLM 先产出概念清单和层级提纲，人工查看中间产物，确认后再生成标准格式。</p></div>
+            <div><h3>人机协同两步法</h3><p>LLM 先产出概念清单和层级提纲，人工检查中间产物，确认后再生成 RDF/OWL 等标准格式。</p></div>
             <p>审查点清晰，适合在一个迭代内做出可评审的 V1。</p>
             <span class="route-fit">快速 V1</span>
           </article>
@@ -1283,6 +1290,15 @@
           <div><strong>行业已有成熟标准</strong>优先复用行业框架，不让模型重新发明一遍。</div>
           <div><strong>准备接入生产</strong>用拆解流水线重做校验、版本、审计和回归。</div>
         </div>
+
+        <h3 style="margin-top: 34px;">视频文稿反复强调的五条经验</h3>
+        <div class="definition-done">
+          <div>NER 是最容易出错的起点，类型、别名和实体边界错了，关系与层级会一路被污染。</div>
+          <div>关系提取要从实例三元组上升为本体关系，不能把文本中的偶然共现当成规则。</div>
+          <div>结构校验和逻辑验证是两层门禁，只有都通过的事实才能进入 Ontology。</div>
+          <div>端到端 Prompt 对措辞敏感，轻微改写就可能改变类型层级，不能直接当生产管道。</div>
+          <div>数据质量比数据量更重要。小而干净、约束明确的样本，往往比大量噪声文档更有用。</div>
+        </div>
       </section>
 
       <section class="content-section" id="pipeline">
@@ -1298,6 +1314,19 @@
           <div class="pipeline-step"><b>03</b><strong>解析</strong><p>处理 Schema、嵌套结构、OCR 和多模态识别。</p></div>
           <div class="pipeline-step"><b>04</b><strong>清洗映射</strong><p>去重、校验、拆宽表，建立小而聚焦的实体表。</p></div>
           <div class="pipeline-step"><b>05</b><strong>对象化</strong><p>把表、行、列和外键映射为类型、对象、属性和关系。</p></div>
+        </div>
+
+        <div class="comparison">
+          <article class="card">
+            <span class="card-label">Dataset</span>
+            <h3>结构化与半结构化的版本容器</h3>
+            <p>保存表、JSON、XML 和每次更新记录。同步语义要区分 Snapshot 全量替换、Append 增量追加，以及 Update 和 Delete 对可变状态的影响。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">MediaSet</span>
+            <h3>非结构化文件与 AI 解析工作流</h3>
+            <p>图片、音频、视频和 PDF 按 Schema Type 与 Primary Format 管理。结构化行通过 Media Reference 指回原文件，便于重跑解析和复核。</p>
+          </article>
         </div>
 
         <div class="data-paths">
@@ -1321,6 +1350,19 @@
           </article>
         </div>
 
+        <div class="comparison">
+          <article class="card">
+            <span class="card-label">Pipeline Builder</span>
+            <h3>可视化变换</h3>
+            <p>适合字段类型推断、过滤、去重、嵌套数组展开和常规映射，方便业务与数据人员一起审查。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">Code Repository</span>
+            <h3>代码管道</h3>
+            <p>复杂规则、自定义解析和性能敏感处理进入 Python、Spark 或 Java 代码。这条路径要有版本、测试和可重现运行记录。</p>
+          </article>
+        </div>
+
         <div class="callout">
           <h3>Media Reference 要保留原始证据</h3>
           <p>结构化后的每一行都应继续指向原始 PDF、图片或音频。当审计人问“这个结论从哪里来”时，系统可以回到原始页和原始版本。</p>
@@ -1333,6 +1375,21 @@
           <div><strong>Ontology index</strong><p>只刷新已改变的对象和关系。</p></div>
         </div>
         <p>批处理与用户实时 Action 之间还有时差。如果不定义合并与冲突规则，系统会同时看到新旧两个状态。</p>
+
+        <h3 style="margin-top: 34px;">宽表拆解是 FDE 最耗时、也最值钱的判断</h3>
+        <p>一张 ERP 宽表往往把订单、客户、商品和物流混在一起。它不能直接映射为一个 Object Type。FDE 需要判断哪些列属于哪个实体、哪些关系要建 Link、哪些概念根本不值得建模。</p>
+        <div class="layer-stack">
+          <div class="layer"><b>Domain Object Types</b><p>订单、商品、仓库等领域共识，跨客户可高度复用。</p></div>
+          <div class="layer"><b>Source System Mappings</b><p>SAP、Oracle、自研系统的表与字段映射，可部分复用，但必须按实际导出结构校正。</p></div>
+          <div class="layer"><b>Customer Extensions</b><p>客户特有字段、流程、动作和例外口径，属于项目现场定制。</p></div>
+        </div>
+
+        <h3>Ontology 相比数据库 Schema 多出三项能力</h3>
+        <div class="decision-rule">
+          <div><strong>全链路追溯</strong>从对象与属性回到干净表、变换步骤和原始文件。</div>
+          <div><strong>隔离写回</strong>Action 的变更写入独立记录，保留原始数据，同时支持审计和回放。</div>
+          <div><strong>应用直接消费</strong>Agent 和业务应用面向对象、关系、函数和动作，不需要每个场景重写一套底层表 API。</div>
+        </div>
       </section>
 
       <section class="content-section" id="operating-layer">
@@ -1369,6 +1426,13 @@
           <strong>LLM 负责理解意图、选择函数和解释结果。</strong>
           <p>专业规则、数学计算和约束交给 Function。高风险变更交给带确认的 Action。这样才能把自然语言的灵活性与业务执行的确定性分开。</p>
         </div>
+
+        <h3 style="margin-top: 34px;">Action Layer 还需要三个辅助工具</h3>
+        <div class="decision-rule">
+          <div><strong>Update Application Variable</strong>Agent 改变 Workshop 或应用页的状态，例如切换仓库范围后联动刷新。</div>
+          <div><strong>Command Tool</strong>触发其他应用操作，例如在地图上标出高风险订单。</div>
+          <div><strong>Request Clarification</strong>指令有歧义时先向用户确认对象和范围，不在不可逆操作上猜。</div>
+        </div>
       </section>
 
       <section class="content-section" id="agent-context">
@@ -1383,9 +1447,9 @@
             <span class="card-label">Retrieval Context</span>
             <h3>每轮都需要的确定信息</h3>
             <ul>
-              <li>当前选中的仓库、订单和客户</li>
+              <li>Ontology Context 绑定当前对象，或用 Vector Embedding 检索相关对象</li>
               <li>今日 KPI、当前角色和权限范围</li>
-              <li>Document Context 返回的合同片段</li>
+              <li>Document Context 按场景使用全文模式或 Chunk 模式</li>
               <li>Function-backed Context 汇总的客户 360 信息</li>
             </ul>
           </div>
@@ -1414,6 +1478,29 @@
           <div class="layer"><b>Logic layer</b><p>调用封装好的 Function 执行风险计算、优化和业务规则。</p></div>
           <div class="layer"><b>Action layer</b><p>产生受控变更。高风险操作要求用户确认，低风险操作可按政策自动执行。</p></div>
           <div class="layer governance"><b>Governance</b><p>权限、数据范围、工具白名单、确认与审计贯穿前四层。</p></div>
+        </div>
+
+        <h3>Tool Calling 怎么暴露给 LLM</h3>
+        <div class="comparison">
+          <article class="card">
+            <span class="card-label">Prompted Tool Calling</span>
+            <h3>兼容性优先</h3>
+            <p>工具说明作为 Prompt 的一部分交给模型，适用范围广，但通常一次选择一个工具。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">Native Tool Calling</span>
+            <h3>性能和 Token 效率优先</h3>
+            <p>使用模型原生工具调用协议，可并行调用多个工具。系统不会把整个 Ontology Schema 塞入 System Prompt，只暴露已配置、已授权且与当前任务相关的能力。</p>
+          </article>
+        </div>
+
+        <h3>一次端到端交互如何串起五层</h3>
+        <div class="pipeline">
+          <div class="pipeline-step"><b>01</b><strong>Context</strong><p>系统确定性注入华南仓、权限和最相关的 Shipment。</p></div>
+          <div class="pipeline-step"><b>02</b><strong>Query</strong><p>按仓库和延误条件筛出 23 个候选订单，再沿 Link 补客户与优先级。</p></div>
+          <div class="pipeline-step"><b>03</b><strong>Logic</strong><p>调用风险函数，找出 5 个高风险订单并生成建议方案。</p></div>
+          <div class="pipeline-step"><b>04</b><strong>Explain</strong><p>LLM 带证据解释结果，询问用户是否执行。</p></div>
+          <div class="pipeline-step"><b>05</b><strong>Action</strong><p>用户确认后创建异常 Case，写回 Ontology 并记录审计日志。</p></div>
         </div>
       </section>
 
@@ -1452,7 +1539,19 @@
           <p>每次调用记录谁在什么时间查了哪些对象、调用了什么函数、请求了什么 Action、用户是否确认以及最终结果。</p>
         </div>
 
-        <p style="margin-top: 26px;">外部 Agent 也应该只通过受治理的 MCP 或工具接口访问 Ontology。修改 Object Type 定义、读取对象数据和执行 Action 属于不同权限面，不应由一个凭证全部打通。</p>
+        <h3 style="margin-top: 34px;">外部 Agent 接入要分开“改结构”与“做业务”</h3>
+        <div class="comparison">
+          <article class="card">
+            <span class="card-label">Palantir MCP</span>
+            <h3>面向开发者与 Ontology Builder</h3>
+            <p>用于提议和修改 Ontology 类型定义，不直接写入业务数据。结构变更还要经过 Proposal Review 和人工审批。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">Ontology MCP</span>
+            <h3>面向外部业务 Agent</h3>
+            <p>在 Application Restrictions 内读取对象、沿关系查询并执行 Action，但不能修改 Object Type 定义。</p>
+          </article>
+        </div>
       </section>
 
       <section class="content-section" id="playbook">
