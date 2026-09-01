@@ -3,8 +3,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const pagePath = new URL('../index.html', import.meta.url);
+const readmePath = new URL('../README.md', import.meta.url);
+const sourceNotesPath = new URL('../source/distillation-notes.md', import.meta.url);
 const pageExists = existsSync(pagePath);
 const html = pageExists ? readFileSync(pagePath, 'utf8') : '';
+const readme = existsSync(readmePath) ? readFileSync(readmePath, 'utf8') : '';
 
 const expectedSectionIds = [
   'problem',
@@ -15,7 +18,6 @@ const expectedSectionIds = [
   'agent-context',
   'governance',
   'playbook',
-  'source',
 ];
 
 test('ships a standalone index page', () => {
@@ -56,11 +58,22 @@ test('covers the construction, operation, context, and governance contracts', ()
   }
 });
 
-test('attributes the source without hotlinking video media', () => {
-  assert.match(
-    html,
-    /href="https:\/\/www\.xiaohongshu\.com\/explore\/6a95742a000000001e014102[^"]*"/,
-  );
+test('omits source statements and distillation notes from the project', () => {
+  const publicCopy = `${html}\n${readme}`;
+  const removedPhrases = [
+    '来源与声明',
+    '来源和蒸馏方法',
+    '主要素材来自小红书视频',
+    '本项目是学习型蒸馏与工程化重写',
+    'source/distillation-notes.md',
+    'xiaohongshu.com',
+  ];
+
+  for (const phrase of removedPhrases) {
+    assert.equal(publicCopy.includes(phrase), false, `must remove: ${phrase}`);
+  }
+
+  assert.equal(existsSync(sourceNotesPath), false, 'distillation notes should be removed');
   assert.doesNotMatch(html, /<(?:img|video|audio|source)[^>]+(?:src|srcset)="https?:\/\//i);
 });
 

@@ -16,14 +16,13 @@
 - Create: `tests/site.test.mjs`
 - Create: `package.json`
 
-- [ ] **Step 1:** 为章节数量、导航映射、必要术语、来源链接、无 CDN 和可访问性写测试。
+- [ ] **Step 1:** 为章节数量、导航映射、必要术语、无 CDN 和可访问性写测试。
 - [ ] **Step 2:** 运行 `npm test`，验证因 `index.html` 缺失而失败。
 
 ### Task 2: 构建单页长文
 
 **Files:**
 - Create: `index.html`
-- Create: `source/distillation-notes.md`
 
 - [ ] **Step 1:** 依设计文档编写完整原创正文与语义化章节。
 - [ ] **Step 2:** 实现内联响应式 CSS、粘性导航和 CSS 原生图解。
@@ -36,7 +35,7 @@
 - Create: `README.md`
 - Create: `.gitignore`
 
-- [ ] **Step 1:** 写清项目目标、内容地图、本地打开方式、来源和非官方声明。
+- [ ] **Step 1:** 写清项目目标、内容地图和本地打开方式。
 - [ ] **Step 2:** 将可视化头脑风暴临时目录 `.superpowers/` 加入忽略规则。
 
 ### Task 4: 渲染与可用性验证
@@ -57,3 +56,12 @@
 - [ ] **Step 2:** 运行 `gh repo create ontology-in-practice --private --source=. --remote=origin --push`。
 - [ ] **Step 3:** 用 `gh repo view --json nameWithOwner,visibility,url,defaultBranchRef` 回读仓库可见性和默认分支。
 - [ ] **Step 4:** 用 `git status --short --branch` 和远端文件列表验证本地/远端一致。
+
+### Task 6: 启用 GitHub Pages
+
+**Files:**
+- Create: `.nojekyll`
+
+- [ ] **Step 1:** 从 `main` 分支根目录启用 GitHub Pages。
+- [ ] **Step 2:** 回读 Pages 配置与部署状态。
+- [ ] **Step 3:** 访问线上 URL，验证标题、8 个章节和无水平溢出。
