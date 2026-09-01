@@ -200,3 +200,11 @@ test('includes accessibility and reduced-motion safeguards', () => {
   assert.match(html, /prefers-reduced-motion:\s*reduce/i);
   assert.match(html, /aria-label="[^"]+"/i);
 });
+
+test('keeps the active navigation item visible on compact layouts', () => {
+  assert.match(html, /matchMedia\('\(max-width: 1050px\)'\)\.matches/);
+  assert.match(
+    html,
+    /activeLink\.scrollIntoView\(\{\s*block:\s*'nearest',\s*inline:\s*'nearest'\s*\}\)/s,
+  );
+});

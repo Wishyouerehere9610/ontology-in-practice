@@ -941,6 +941,13 @@
       border-radius: 18px;
     }
 
+    .table-hint {
+      display: none;
+      margin: -20px 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .decision-table {
       width: 100%;
       min-width: 680px;
@@ -1229,6 +1236,10 @@
       .source-box dd {
         margin-bottom: 12px;
       }
+
+      .table-hint {
+        display: block;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1398,6 +1409,7 @@
           先判断问题需要哪种结构，再决定是否建模。简单文档问答直接使用 RAG 往往更快。只有当对象、关系、规则和动作需要长期稳定复用时，Ontology 的建设成本才更容易得到回报。
         </p>
 
+        <p class="table-hint">表格可左右滑动查看完整内容。</p>
         <div class="table-wrap">
           <table class="decision-table">
             <thead><tr><th>问题类型</th><th>优先方案</th><th>判断依据</th></tr></thead>
@@ -1840,6 +1852,7 @@
           <span class="evidence-tag verify">待现场核验</span>
           公开页面可以说明产品声称具备哪些能力，但不能替代真实客户数据、运行 Trace、权限配置和发布读回。
         </p>
+        <p class="table-hint">表格可左右滑动查看完整内容。</p>
         <div class="table-wrap">
           <table class="decision-table">
             <thead><tr><th>能力</th><th>FlyOntOS 待验证点</th><th>腾讯 FDE 交付物</th></tr></thead>
@@ -1947,10 +1960,18 @@
 
       if (!visible) return;
 
+      let activeLink;
       for (const link of navLinks) {
         const current = link.getAttribute('href') === `#${visible.target.id}`;
-        if (current) link.setAttribute('aria-current', 'true');
+        if (current) {
+          activeLink = link;
+          link.setAttribute('aria-current', 'true');
+        }
         else link.removeAttribute('aria-current');
+      }
+
+      if (activeLink && window.matchMedia('(max-width: 1050px)').matches) {
+        activeLink.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     }, { rootMargin: '-20% 0px -64% 0px', threshold: [0, 0.2, 0.6] });
 
