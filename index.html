@@ -906,6 +906,123 @@
       margin: 0;
     }
 
+    .evidence-tag {
+      display: inline-flex;
+      align-items: center;
+      margin: 0 6px 10px 0;
+      padding: 3px 8px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border: 1px solid #b6d0da;
+      border-radius: 999px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .evidence-tag.advice {
+      color: var(--green);
+      background: var(--green-soft);
+      border-color: #b8d1c1;
+    }
+
+    .evidence-tag.verify {
+      color: var(--red);
+      background: var(--red-soft);
+      border-color: #dfbbb6;
+    }
+
+    .table-wrap {
+      margin: 32px 0;
+      overflow-x: auto;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .decision-table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .decision-table th,
+    .decision-table td {
+      padding: 16px 18px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .decision-table th {
+      color: var(--muted);
+      background: #eef0ec;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .decision-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .decision-table td:first-child {
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 30px 0;
+    }
+
+    .metric-card {
+      padding: 20px;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+    }
+
+    .metric-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .release-loop {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 30px 0;
+    }
+
+    .release-loop div {
+      padding: 16px;
+      background: var(--blue-soft);
+      border: 1px solid #bfd4dc;
+      border-radius: 13px;
+      font-size: 13px;
+    }
+
+    .release-loop b {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+
     footer {
       width: min(100%, var(--content));
       margin: 90px auto 0;
@@ -1037,7 +1154,8 @@
       .data-paths,
       .operating-grid,
       .permission-demo,
-      .definition-done {
+      .definition-done,
+      .metric-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1075,7 +1193,8 @@
       }
 
       .decision-rule,
-      .incremental {
+      .incremental,
+      .release-loop {
         grid-template-columns: 1fr;
       }
 
@@ -1144,12 +1263,15 @@
       <ol>
         <li><a href="#problem" data-index="01">问题</a></li>
         <li><a href="#definition" data-index="02">定义</a></li>
-        <li><a href="#routes" data-index="03">构建路线</a></li>
-        <li><a href="#pipeline" data-index="04">数据管道</a></li>
-        <li><a href="#operating-layer" data-index="05">操作层</a></li>
-        <li><a href="#agent-context" data-index="06">Agent 上下文</a></li>
-        <li><a href="#governance" data-index="07">权限治理</a></li>
-        <li><a href="#playbook" data-index="08">落地清单</a></li>
+        <li><a href="#selection" data-index="03">方案选型</a></li>
+        <li><a href="#routes" data-index="04">构建路线</a></li>
+        <li><a href="#pipeline" data-index="05">数据管道</a></li>
+        <li><a href="#operating-layer" data-index="06">操作层</a></li>
+        <li><a href="#agent-context" data-index="07">Agent 上下文</a></li>
+        <li><a href="#governance" data-index="08">权限治理</a></li>
+        <li><a href="#production" data-index="09">生产验收</a></li>
+        <li><a href="#playbook" data-index="10">落地清单</a></li>
+        <li><a href="#sources" data-index="11">来源边界</a></li>
       </ol>
     </nav>
 
@@ -1158,7 +1280,7 @@
         <p class="eyebrow">Enterprise AI / FDE Field Notes</p>
         <h1>Ontology<span>从一堆文档，到 AI 能理解并执行的业务世界</span></h1>
         <p class="hero-deck">
-          RAG 能帮模型找到文字，却不会自动定义供应商是谁、评分怎么算、哪些动作可以执行。Ontology 补的就是这一层。
+          RAG 擅长找到文字。当任务进一步涉及统一对象、稳定口径、业务计算和受控写回时，企业还需要一层可治理的业务模型。
         </p>
         <div class="hero-meta" aria-label="文档元信息">
           <span class="chip">15-20 分钟阅读</span>
@@ -1215,10 +1337,34 @@
 
       <section class="content-section" id="definition">
         <p class="section-kicker">02 / Definition</p>
-        <h2>Ontology 是业务世界的操作层</h2>
+        <h2>先分清三层，再谈 Ontology</h2>
         <p class="lead">
-          知识图谱主要回答“世界里有什么”。企业 Ontology 还需要回答“能计算什么”和“允许改变什么”。这才是 Agent 从问答工具走向业务操作员的前提。
+          本文使用的是广义的企业 Ontology。它从标准语义模型出发，连接知识图谱中的业务事实，再由平台补上函数、动作、权限和审计。三层可以组合，但不能混为一个概念。
         </p>
+
+        <div aria-label="概念证据边界">
+          <span class="evidence-tag">标准定义</span>
+          <span class="evidence-tag">厂商产品语义</span>
+          <span class="evidence-tag advice">工程建议</span>
+        </div>
+
+        <div class="data-paths">
+          <article class="card">
+            <span class="card-label">Semantic Ontology</span>
+            <h3>语义本体</h3>
+            <p>用 Class、Property、Individual 和 Axiom 定义领域词汇、关系与约束。OWL/RDF 文件属于这一层。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">Knowledge Graph</span>
+            <h3>知识图谱</h3>
+            <p>保存具体实体、事实和关系实例。生产系统还应记录来源、时间、版本与置信度。</p>
+          </article>
+          <article class="card">
+            <span class="card-label">Operational Ontology</span>
+            <h3>企业操作层</h3>
+            <p>把对象、逻辑、动作、安全和应用连起来，使人和 Agent 能在业务边界内查询、判断和执行。</p>
+          </article>
+        </div>
 
         <div class="ontology-model" aria-label="Ontology 的语义与动态能力模型">
           <div class="model-side semantic">
@@ -1242,14 +1388,42 @@
           </div>
         </div>
 
-        <p>数据库 Schema 是存储结构。Ontology 在它之上增加业务含义、可执行规则和访问边界。应用和 Agent 面对的不再是表名与列名，而是“优先订单”、“延误风险”和“改派承运商”这类业务概念。</p>
+        <p>数据库 Schema 主要描述存储结构。语义本体在它之上增加业务含义、关系和约束，企业平台再连接 Function、Action、权限与审计。Function 和 Action 不是 OWL 文件天然具备的能力，而是操作层提供的运行能力。</p>
+      </section>
+
+      <section class="content-section" id="selection">
+        <p class="section-kicker">03 / Architecture choice</p>
+        <h2>不是所有业务都需要 Ontology</h2>
+        <p class="lead">
+          先判断问题需要哪种结构，再决定是否建模。简单文档问答直接使用 RAG 往往更快。只有当对象、关系、规则和动作需要长期稳定复用时，Ontology 的建设成本才更容易得到回报。
+        </p>
+
+        <div class="table-wrap">
+          <table class="decision-table">
+            <thead><tr><th>问题类型</th><th>优先方案</th><th>判断依据</th></tr></thead>
+            <tbody>
+              <tr><td>文档搜索、摘要和引用</td><td>RAG</td><td>目标是找到原文并生成带引用回答，不需要统一业务对象。</td></tr>
+              <tr><td>元数据过滤与稳定口径</td><td>结构化 RAG</td><td>文档已有清晰标签、时间、组织和版本，可以先约束检索范围。</td></tr>
+              <tr><td>实体关系穿透</td><td>知识图谱或 GraphRAG</td><td>问题依赖多跳关系，但暂时不涉及复杂写操作和治理。</td></tr>
+              <tr><td>跨系统对象统一与规则推理</td><td>Ontology</td><td>同一业务对象散落在多个系统，需要统一语义、约束和可解释判断。</td></tr>
+              <tr><td>业务写回、审批和审计</td><td>企业操作层 + Agent</td><td>任务会改变真实系统，需要权限、确认、幂等、回滚和责任边界。</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>出现这些情况时，先不要建设 Ontology</h3>
+        <div class="decision-rule">
+          <div><strong>业务口径仍在频繁变化</strong>概念和流程尚未稳定，过早抽象会把团队拖进反复迁移。</div>
+          <div><strong>数据与负责人没有到位</strong>没有事实源、访问权限和能调整流程的业务负责人，模型无法进入日常工作。</div>
+          <div><strong>问题只需要检索</strong>如果 RAG 已能稳定解决，继续增加语义层只会提高维护成本。</div>
+        </div>
       </section>
 
       <section class="content-section" id="routes">
-        <p class="section-kicker">03 / Construction routes</p>
+        <p class="section-kicker">04 / Construction routes</p>
         <h2>五种构建路线，不要只选最快的</h2>
         <p class="lead">
-          视频中的五种方法适用于不同阶段。生产项目往往会混合使用，但上线前必须回到可验证的拆解流水线。
+          下面是五种常见的实践路线，不是行业唯一分类。生产项目往往会混合使用，但上线前必须回到可验证的拆解流水线。
         </p>
 
         <div class="route-list">
@@ -1291,7 +1465,7 @@
           <div><strong>准备接入生产</strong>用拆解流水线重做校验、版本、审计和回归。</div>
         </div>
 
-        <h3 style="margin-top: 34px;">视频文稿反复强调的五条经验</h3>
+        <h3 style="margin-top: 34px;">构建时最容易忽略的五条经验</h3>
         <div class="definition-done">
           <div>NER 是最容易出错的起点，类型、别名和实体边界错了，关系与层级会一路被污染。</div>
           <div>关系提取要从实例三元组上升为本体关系，不能把文本中的偶然共现当成规则。</div>
