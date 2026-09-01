@@ -1283,7 +1283,7 @@
           RAG 擅长找到文字。当任务进一步涉及统一对象、稳定口径、业务计算和受控写回时，企业还需要一层可治理的业务模型。
         </p>
         <div class="hero-meta" aria-label="文档元信息">
-          <span class="chip">15-20 分钟阅读</span>
+          <span class="chip">20-30 分钟阅读</span>
           <span class="chip">适合 FDE / Agent 工程师</span>
           <span class="chip">版本 2026.09</span>
         </div>
@@ -1886,6 +1886,40 @@
           <div>候选版本通过代表性样本与坏例的回归门禁。</div>
           <div>试点用户持续使用，流程负责人确认业务结果和自动化边界。</div>
           <div>客户定制、行业模板和公共产品能力有清晰边界。</div>
+        </div>
+      </section>
+
+      <section class="content-section" id="sources">
+        <p class="section-kicker">11 / Sources and boundaries</p>
+        <h2>知道哪些是标准，哪些还要现场验证</h2>
+        <p class="lead">
+          这份指南把标准定义、厂商产品语义和工程建议放在同一条交付链中，但三者的证据强度不同。厂商页面可以证明它公开声明了什么，不能替代客户验收、运行 Trace 和生产指标。
+        </p>
+
+        <div class="source-box">
+          <span class="evidence-tag">标准定义</span>
+          <span class="evidence-tag">厂商产品语义</span>
+          <span class="evidence-tag advice">工程建议</span>
+          <span class="evidence-tag verify">待现场核验</span>
+          <dl>
+            <dt>W3C OWL 2</dt>
+            <dd><a href="https://www.w3.org/TR/owl2-quick-reference/" target="_blank" rel="noreferrer">OWL 2 Quick Reference</a>用于界定 Class、Property、Individual 和 Axiom 等标准语义能力。</dd>
+
+            <dt>Palantir</dt>
+            <dd><a href="https://www.palantir.com/docs/foundry/architecture-center/ontology-system" target="_blank" rel="noreferrer">The Ontology System</a>用于理解数据、逻辑、动作和安全如何组成企业操作层。这是厂商产品语义，不是 OWL 标准定义。</dd>
+
+            <dt>WorkBuddy</dt>
+            <dd><a href="https://cloud.tencent.com/document/product/1831/137039" target="_blank" rel="noreferrer">WorkBuddy Enterprise MCP 使用文档</a>证明产品支持自定义 MCP 接入。具体身份透传、权限和生产拓扑仍需按客户环境验证。</dd>
+
+            <dt>FlyOntOS</dt>
+            <dd><a href="https://www.flydiy.cn/" target="_blank" rel="noreferrer">产品首页</a>、<a href="https://www.flydiy.cn/ontologies" target="_blank" rel="noreferrer">本体库</a>和<a href="https://www.flydiy.cn/cases" target="_blank" rel="noreferrer">案例馆</a>用于了解厂商公开定位、资产和案例。数量与“Verified Case”标签不直接等于独立生产证明。</dd>
+
+            <dt>OntoBench</dt>
+            <dd><a href="https://www.flydiy.cn/benchmarks" target="_blank" rel="noreferrer">公开基准页面</a>明确把相关数值称为方案目标。真实结果应以可复现实验、正式报告和客户运行证据为准。</dd>
+
+            <dt>工程判断</dt>
+            <dd>方案选型、Function 分类、Action 失败恢复、指标口径和发布门禁是本文面向 FDE 的工程归纳。落地时应根据客户事实源、风险等级和责任边界调整。</dd>
+          </dl>
         </div>
       </section>
 
