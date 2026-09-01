@@ -1,0 +1,1530 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="一份面向企业 AI 与 FDE 的 Ontology 落地指南，覆盖构建路线、数据管道、Agent 交互、权限治理和生产验收。">
+  <title>Ontology in Practice | 从文档到可执行的业务操作层</title>
+  <style>
+    :root {
+      --paper: #f4f4ef;
+      --paper-strong: #fbfbf8;
+      --ink: #171b1a;
+      --muted: #65706c;
+      --line: #d8ddd8;
+      --line-strong: #aeb9b3;
+      --blue: #255f75;
+      --blue-soft: #dcebf0;
+      --green: #3f745f;
+      --green-soft: #dfede4;
+      --yellow: #efe3a1;
+      --red: #a94d43;
+      --red-soft: #f1dfdc;
+      --shadow: 0 18px 48px rgba(24, 35, 31, 0.09);
+      --radius: 18px;
+      --content: 820px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23, 27, 26, 0.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 27, 26, 0.032) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.75;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 100;
+      padding: 10px 14px;
+      color: white;
+      background: var(--ink);
+      border-radius: 8px;
+      transform: translateY(-160%);
+      transition: transform 160ms ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .reading-progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      z-index: 90;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+    }
+
+    .reading-progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: var(--blue);
+      transform-origin: left center;
+    }
+
+    .page-shell {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: clamp(44px, 6vw, 96px);
+      width: min(1260px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 32px 0 96px;
+    }
+
+    .side-nav {
+      position: sticky;
+      top: 28px;
+      align-self: start;
+      max-height: calc(100vh - 56px);
+      padding: 18px;
+      overflow: auto;
+      background: rgba(251, 251, 248, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(24, 35, 31, 0.05);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      color: white;
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .brand strong,
+    .brand small {
+      display: block;
+    }
+
+    .brand strong {
+      font-size: 13px;
+      letter-spacing: 0.02em;
+    }
+
+    .brand small {
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .side-nav ol {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .side-nav a {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 9px;
+      color: var(--muted);
+      border-radius: 9px;
+      font-size: 12px;
+      text-decoration: none;
+      transition: color 160ms ease, background 160ms ease;
+    }
+
+    .side-nav a::before {
+      content: attr(data-index);
+      color: var(--line-strong);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+    }
+
+    .side-nav a:hover,
+    .side-nav a[aria-current="true"] {
+      color: var(--ink);
+      background: var(--blue-soft);
+    }
+
+    main {
+      min-width: 0;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 720px;
+      padding: clamp(48px, 8vw, 96px) clamp(28px, 6vw, 72px) 48px;
+      overflow: hidden;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -180px;
+      right: -160px;
+      width: 440px;
+      height: 440px;
+      background: radial-gradient(circle, rgba(37, 95, 117, 0.18), rgba(37, 95, 117, 0));
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 18px;
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin-bottom: 24px;
+      font-size: clamp(44px, 7vw, 86px);
+      font-weight: 780;
+      letter-spacing: -0.055em;
+      line-height: 0.98;
+    }
+
+    h1 span {
+      display: block;
+      margin-top: 14px;
+      color: var(--blue);
+      font-family: ui-serif, Georgia, "Times New Roman", serif;
+      font-size: 0.48em;
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .hero-deck {
+      max-width: 650px;
+      margin-bottom: 34px;
+      color: #3f4945;
+      font-size: clamp(18px, 2vw, 22px);
+      line-height: 1.65;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 52px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 11px;
+      color: #42514b;
+      background: #eef0ec;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .thesis {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+      padding: 24px;
+      background: var(--ink);
+      border-radius: 18px;
+      color: #f5f5ef;
+    }
+
+    .thesis p {
+      max-width: 590px;
+      margin: 0;
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.55;
+    }
+
+    .thesis-code {
+      color: #b9cec4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .content-section {
+      width: min(100%, var(--content));
+      margin: 0 auto;
+      padding: 112px 0 0;
+      scroll-margin-top: 20px;
+    }
+
+    h2 {
+      margin-bottom: 24px;
+      font-size: clamp(32px, 4vw, 50px);
+      letter-spacing: -0.045em;
+      line-height: 1.12;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      line-height: 1.35;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin-bottom: 36px;
+      color: #3e4844;
+      font-size: 19px;
+      line-height: 1.75;
+    }
+
+    .callout {
+      margin: 34px 0;
+      padding: 24px 26px;
+      background: var(--yellow);
+      border: 1px solid #d8ca79;
+      border-radius: var(--radius);
+    }
+
+    .callout p:last-child,
+    .card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .card {
+      padding: 24px;
+      background: rgba(251, 251, 248, 0.86);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .card.bad {
+      background: var(--red-soft);
+      border-color: #dfbbb6;
+    }
+
+    .card.good {
+      background: var(--green-soft);
+      border-color: #bdd3c5;
+    }
+
+    .card-label {
+      display: inline-block;
+      margin-bottom: 16px;
+      padding: 3px 8px;
+      color: var(--muted);
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .score {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .score span {
+      display: grid;
+      place-items: center;
+      min-width: 50px;
+      height: 42px;
+      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(23, 27, 26, 0.16);
+      border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+    }
+
+    .four-hurdles {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .four-hurdles div {
+      min-height: 140px;
+      padding: 18px;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .four-hurdles strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .four-hurdles p {
+      margin: 0;
+      color: #4b5551;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .ontology-model {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 110px 1fr;
+      align-items: stretch;
+      margin: 38px 0;
+      padding: 24px;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+    }
+
+    .model-side {
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    .model-side.semantic {
+      background: var(--blue-soft);
+    }
+
+    .model-side.kinetic {
+      background: var(--green-soft);
+    }
+
+    .model-side ul {
+      margin: 16px 0 0;
+      padding-left: 18px;
+    }
+
+    .model-side li {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .model-bridge {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .model-bridge::before,
+    .model-bridge::after {
+      content: "";
+      width: 56px;
+      height: 1px;
+      background: var(--line-strong);
+    }
+
+    .route-list {
+      display: grid;
+      gap: 12px;
+      margin: 38px 0;
+    }
+
+    .route {
+      display: grid;
+      grid-template-columns: 58px 1.3fr 1fr 120px;
+      gap: 18px;
+      align-items: center;
+      padding: 20px;
+      background: rgba(251, 251, 248, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .route.recommended {
+      border-color: var(--blue);
+      box-shadow: inset 4px 0 0 var(--blue);
+    }
+
+    .route-number {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      color: white;
+      background: var(--ink);
+      border-radius: 50%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .route h3,
+    .route p {
+      margin: 0;
+    }
+
+    .route p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .route-fit {
+      justify-self: end;
+      padding: 5px 9px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .decision-rule {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .decision-rule div {
+      padding: 18px;
+      background: #e8ebe7;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .decision-rule strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0;
+      margin: 38px 0;
+      overflow: hidden;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .pipeline-step {
+      position: relative;
+      min-height: 180px;
+      padding: 20px 16px;
+      border-right: 1px solid var(--line);
+    }
+
+    .pipeline-step:last-child {
+      border-right: 0;
+    }
+
+    .pipeline-step b {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .pipeline-step strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .pipeline-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .data-paths {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 28px 0;
+    }
+
+    .data-paths .card {
+      padding: 20px;
+    }
+
+    .code-line {
+      display: block;
+      margin-top: 16px;
+      padding: 10px 12px;
+      overflow-wrap: anywhere;
+      color: #d9e7df;
+      background: #242a28;
+      border-radius: 9px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .incremental {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: 28px;
+      overflow: hidden;
+      background: var(--line-strong);
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+    }
+
+    .incremental div {
+      padding: 20px;
+      background: var(--paper-strong);
+    }
+
+    .incremental strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--green);
+    }
+
+    .incremental p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .operating-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 34px 0;
+    }
+
+    .operating-card {
+      min-height: 230px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .operating-card:nth-child(-n + 2) {
+      background: var(--blue-soft);
+    }
+
+    .operating-card:nth-child(n + 3) {
+      background: var(--green-soft);
+    }
+
+    .operating-card .mono {
+      display: block;
+      margin-bottom: 34px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .operating-card p {
+      margin-bottom: 0;
+      color: #41504a;
+      font-size: 14px;
+    }
+
+    .context-query {
+      display: grid;
+      grid-template-columns: 1fr 64px 1fr;
+      align-items: stretch;
+      margin: 38px 0;
+    }
+
+    .context-box {
+      padding: 24px;
+      background: var(--blue-soft);
+      border: 1px solid #b9d0d9;
+      border-radius: 18px;
+    }
+
+    .query-box {
+      padding: 24px;
+      background: var(--green-soft);
+      border: 1px solid #b9d2c2;
+      border-radius: 18px;
+    }
+
+    .context-query ul {
+      margin-bottom: 0;
+      padding-left: 18px;
+      font-size: 14px;
+    }
+
+    .versus {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+    }
+
+    .layer-stack {
+      display: grid;
+      gap: 8px;
+      margin: 34px 0;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 22px;
+      align-items: center;
+      padding: 18px 20px;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .layer b {
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .layer p {
+      margin: 0;
+      color: #47524e;
+      font-size: 14px;
+    }
+
+    .layer.governance {
+      color: #f5f5ef;
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .layer.governance b,
+    .layer.governance p {
+      color: inherit;
+    }
+
+    .permission-demo {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 32px 0;
+    }
+
+    .permission-card {
+      padding: 24px;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .permission-card ul {
+      margin: 18px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .permission-card li {
+      padding: 8px 0;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .permission-card li::before {
+      display: inline-block;
+      width: 18px;
+      color: var(--green);
+      content: "+";
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+    }
+
+    .permission-card li.denied::before {
+      color: var(--red);
+      content: "×";
+    }
+
+    .guardrail {
+      padding: 26px;
+      color: #f5f5ef;
+      background: var(--ink);
+      border-radius: 18px;
+    }
+
+    .guardrail strong {
+      display: block;
+      margin-bottom: 10px;
+      color: #b9d9ca;
+      font-size: 18px;
+    }
+
+    .guardrail p {
+      margin: 0;
+      color: #d8dfdc;
+    }
+
+    .playbook {
+      margin: 36px 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: playbook;
+    }
+
+    .playbook li {
+      counter-increment: playbook;
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 18px;
+      padding: 24px 0;
+      border-top: 1px solid var(--line-strong);
+    }
+
+    .playbook li::before {
+      content: counter(playbook, decimal-leading-zero);
+      color: var(--blue);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .playbook h3 {
+      margin-bottom: 6px;
+    }
+
+    .playbook p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .definition-done {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 36px;
+    }
+
+    .definition-done div {
+      padding: 18px 20px;
+      background: var(--green-soft);
+      border: 1px solid #bed6c7;
+      border-radius: 14px;
+      font-size: 13px;
+    }
+
+    .source-box {
+      padding: 30px;
+      background: var(--paper-strong);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .source-box a {
+      color: var(--blue);
+      font-weight: 700;
+      text-underline-offset: 4px;
+    }
+
+    .source-box dl {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px 20px;
+      margin: 26px 0 0;
+      font-size: 13px;
+    }
+
+    .source-box dt {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .source-box dd {
+      margin: 0;
+    }
+
+    footer {
+      width: min(100%, var(--content));
+      margin: 90px auto 0;
+      padding-top: 24px;
+      color: var(--muted);
+      border-top: 1px solid var(--line-strong);
+      font-size: 12px;
+    }
+
+    @media (max-width: 1050px) {
+      .page-shell {
+        grid-template-columns: 1fr;
+        gap: 0;
+        width: min(920px, calc(100% - 32px));
+        padding-top: 18px;
+      }
+
+      .side-nav {
+        top: 8px;
+        z-index: 70;
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        max-height: none;
+        margin-bottom: 18px;
+        padding: 10px 12px;
+        overflow: hidden;
+      }
+
+      .brand {
+        grid-template-columns: 30px 1fr;
+        min-width: 180px;
+        padding: 0 16px 0 0;
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+      }
+
+      .side-nav ol {
+        display: flex;
+        gap: 4px;
+        margin: 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+
+      .side-nav ol::-webkit-scrollbar {
+        display: none;
+      }
+
+      .side-nav a {
+        display: block;
+        padding: 7px 10px;
+        white-space: nowrap;
+      }
+
+      .side-nav a::before {
+        display: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        background-size: 24px 24px;
+      }
+
+      .page-shell {
+        width: min(100% - 20px, 680px);
+      }
+
+      .side-nav {
+        gap: 8px;
+      }
+
+      .brand {
+        min-width: 38px;
+        padding-right: 8px;
+      }
+
+      .brand div:last-child {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 56px 22px 24px;
+        border-radius: 20px;
+      }
+
+      h1 {
+        font-size: clamp(42px, 15vw, 64px);
+      }
+
+      .hero-deck {
+        font-size: 17px;
+      }
+
+      .hero-meta {
+        margin-bottom: 34px;
+      }
+
+      .thesis {
+        grid-template-columns: 1fr;
+      }
+
+      .thesis-code {
+        white-space: normal;
+      }
+
+      .content-section {
+        padding-top: 86px;
+      }
+
+      h2 {
+        font-size: 34px;
+      }
+
+      .lead {
+        font-size: 17px;
+      }
+
+      .comparison,
+      .data-paths,
+      .operating-grid,
+      .permission-demo,
+      .definition-done {
+        grid-template-columns: 1fr;
+      }
+
+      .four-hurdles {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .ontology-model,
+      .context-query {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .model-bridge,
+      .versus {
+        min-height: 34px;
+      }
+
+      .model-bridge::before,
+      .model-bridge::after {
+        display: none;
+      }
+
+      .route {
+        grid-template-columns: 46px 1fr;
+      }
+
+      .route > p {
+        grid-column: 2;
+      }
+
+      .route-fit {
+        grid-column: 2;
+        justify-self: start;
+      }
+
+      .decision-rule,
+      .incremental {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-step {
+        min-height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .pipeline-step:last-child {
+        border-bottom: 0;
+      }
+
+      .layer {
+        grid-template-columns: 1fr;
+        gap: 7px;
+      }
+
+      .source-box {
+        padding: 22px;
+      }
+
+      .source-box dl {
+        grid-template-columns: 1fr;
+        gap: 3px;
+      }
+
+      .source-box dd {
+        margin-bottom: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到正文</a>
+  <div class="reading-progress" aria-hidden="true"><span id="progress-bar"></span></div>
+
+  <div class="page-shell">
+    <nav class="side-nav" aria-label="章节导航">
+      <div class="brand">
+        <div class="brand-mark">O/I</div>
+        <div>
+          <strong>Ontology in Practice</strong>
+          <small>从文档到业务操作层</small>
+        </div>
+      </div>
+      <ol>
+        <li><a href="#problem" data-index="01">问题</a></li>
+        <li><a href="#definition" data-index="02">定义</a></li>
+        <li><a href="#routes" data-index="03">构建路线</a></li>
+        <li><a href="#pipeline" data-index="04">数据管道</a></li>
+        <li><a href="#operating-layer" data-index="05">操作层</a></li>
+        <li><a href="#agent-context" data-index="06">Agent 上下文</a></li>
+        <li><a href="#governance" data-index="07">权限治理</a></li>
+        <li><a href="#playbook" data-index="08">落地清单</a></li>
+        <li><a href="#source" data-index="09">来源</a></li>
+      </ol>
+    </nav>
+
+    <main id="main-content">
+      <header class="hero">
+        <p class="eyebrow">Enterprise AI / FDE Field Notes</p>
+        <h1>Ontology<span>从一堆文档，到 AI 能理解并执行的业务世界</span></h1>
+        <p class="hero-deck">
+          RAG 能帮模型找到文字，却不会自动定义供应商是谁、评分怎么算、哪些动作可以执行。Ontology 补的就是这一层。
+        </p>
+        <div class="hero-meta" aria-label="文档元信息">
+          <span class="chip">10-15 分钟阅读</span>
+          <span class="chip">适合 FDE / Agent 工程师</span>
+          <span class="chip">版本 2026.09</span>
+          <span class="chip">基于 48 分钟公开视频蒸馏</span>
+        </div>
+        <div class="thesis">
+          <p>Ontology 的价值不在“把表改个业务名字”，而在将对象、关系、规则、函数、动作和权限放到同一个可治理的操作层中。</p>
+          <span class="thesis-code">data → meaning → decision → action</span>
+        </div>
+      </header>
+
+      <section class="content-section" id="problem">
+        <p class="section-kicker">01 / The problem</p>
+        <h2>文档都在，答案为什么还会飘</h2>
+        <p class="lead">
+          老板问“供应商 A 的评分是多少”。同一个 Agent，上午答 85，过两分钟又答 92。数据未必丢了，模型只是不知道评分对象、指标口径和时间版本之间的关系。
+        </p>
+
+        <div class="comparison">
+          <article class="card bad">
+            <span class="card-label">没有 Ontology</span>
+            <h3>把文档直接扔给 LLM</h3>
+            <p>RAG 找回了几段相关文字，模型自己猜哪个数字是最终评分。</p>
+            <div class="score" aria-label="不稳定的评分结果"><span>85</span><span>92</span><span>78</span></div>
+          </article>
+          <article class="card good">
+            <span class="card-label">有 Ontology</span>
+            <h3>先定义业务对象和口径</h3>
+            <p>供应商、材料、评分规则、生效日期和负责人都有明确关系。Agent 按口径查询，不需要临场拼凑。</p>
+          </article>
+        </div>
+
+        <div class="callout">
+          <h3>问题不是“模型没看到数据”</h3>
+          <p>真正缺的是业务语义和执行边界。企业需要告诉 AI：有哪些对象，它们如何关联，规则怎么算，什么人能做什么。</p>
+        </div>
+
+        <h3>LLM 建 Ontology 的四道坎</h3>
+        <div class="four-hurdles">
+          <div><strong>01</strong><p>不知道一开始应该有多少种实体。</p></div>
+          <div><strong>02</strong><p>模型会创造原始数据中不存在的概念。</p></div>
+          <div><strong>03</strong><p>粒度太粗没法用，太细又维护不起。</p></div>
+          <div><strong>04</strong><p>很难用一个通用分数判断 Ontology 好不好。</p></div>
+        </div>
+      </section>
+
+      <section class="content-section" id="definition">
+        <p class="section-kicker">02 / Definition</p>
+        <h2>Ontology 是业务世界的操作层</h2>
+        <p class="lead">
+          知识图谱主要回答“世界里有什么”。企业 Ontology 还需要回答“能计算什么”和“允许改变什么”。这才是 Agent 从问答工具走向业务操作员的前提。
+        </p>
+
+        <div class="ontology-model" aria-label="Ontology 的语义与动态能力模型">
+          <div class="model-side semantic">
+            <span class="card-label">Semantic</span>
+            <h3>描述世界</h3>
+            <ul>
+              <li>Object Type：订单、仓库、客户</li>
+              <li>Property：状态、时间、服务等级</li>
+              <li>Link：订单属于客户，运输由承运商负责</li>
+            </ul>
+          </div>
+          <div class="model-bridge">翻译为<br>业务语言</div>
+          <div class="model-side kinetic">
+            <span class="card-label">Kinetic</span>
+            <h3>计算和改变世界</h3>
+            <ul>
+              <li>Function：计算延误风险和影响范围</li>
+              <li>Action：改派承运商、更新 ETA</li>
+              <li>Policy：权限、确认、审计和回滚</li>
+            </ul>
+          </div>
+        </div>
+
+        <p>数据库 Schema 是存储结构。Ontology 在它之上增加业务含义、可执行规则和访问边界。应用和 Agent 面对的不再是表名与列名，而是“优先订单”、“延误风险”和“改派承运商”这类业务概念。</p>
+      </section>
+
+      <section class="content-section" id="routes">
+        <p class="section-kicker">03 / Construction routes</p>
+        <h2>五种构建路线，不要只选最快的</h2>
+        <p class="lead">
+          视频中的五种方法适用于不同阶段。生产项目往往会混合使用，但上线前必须回到可验证的拆解流水线。
+        </p>
+
+        <div class="route-list">
+          <article class="route recommended">
+            <span class="route-number">01</span>
+            <div><h3>拆解流水线</h3><p>实体提取、关系识别、去重、结构校验、逻辑验证和存图分开执行。失败的事实只进日志。</p></div>
+            <p>工程量最大，可追溯性和稳定性最好。业务专家要定义验证规则。</p>
+            <span class="route-fit">生产首选</span>
+          </article>
+          <article class="route">
+            <span class="route-number">02</span>
+            <div><h3>数据聚类</h3><p>先从文档提取名词，再用不需预设类别数量的聚类方法分组，最后让 LLM 命名。</p></div>
+            <p>新领域里很实用，但聚类质量会直接影响实体粒度。</p>
+            <span class="route-fit">探索未知领域</span>
+          </article>
+          <article class="route">
+            <span class="route-number">03</span>
+            <div><h3>人机协同两步法</h3><p>LLM 先产出概念清单和层级提纲，人工查看中间产物，确认后再生成标准格式。</p></div>
+            <p>审查点清晰，适合在一个迭代内做出可评审的 V1。</p>
+            <span class="route-fit">快速 V1</span>
+          </article>
+          <article class="route">
+            <span class="route-number">04</span>
+            <div><h3>行业框架约束</h3><p>用已有行业本体、类型规范或知识库约束 LLM，只允许它在既定语义范围内提取。</p></div>
+            <p>可减少自造概念，也方便对齐金融、医疗和电力等行业标准。</p>
+            <span class="route-fit">有标准的行业</span>
+          </article>
+          <article class="route">
+            <span class="route-number">05</span>
+            <div><h3>端到端原型</h3><p>一个 Prompt 让 LLM 从文本直接输出 Ontology，一个模型包办所有步骤。</p></div>
+            <p>速度快，但对 Prompt 极度敏感。只适合学习、演示和假设验证。</p>
+            <span class="route-fit">只做原型</span>
+          </article>
+        </div>
+
+        <div class="decision-rule" aria-label="构建路线选择规则">
+          <div><strong>不知道领域里有什么</strong>先用数据聚类或人机协同整理候选实体。</div>
+          <div><strong>行业已有成熟标准</strong>优先复用行业框架，不让模型重新发明一遍。</div>
+          <div><strong>准备接入生产</strong>用拆解流水线重做校验、版本、审计和回归。</div>
+        </div>
+      </section>
+
+      <section class="content-section" id="pipeline">
+        <p class="section-kicker">04 / Data pipeline</p>
+        <h2>从原始文件到 Ontology，中间不能省</h2>
+        <p class="lead">
+          现实中的输入有 CSV、嵌套 JSON、数据库宽表、扫描 PDF 和手写记录。它们不会直接变成业务对象。真正费时间的部分，是接入、保留原始证据、解析、清洗和映射。
+        </p>
+
+        <div class="pipeline" aria-label="从数据接入到 Ontology 对象的五个阶段">
+          <div class="pipeline-step"><b>01</b><strong>连接</strong><p>原样拉取，不在源系统前置改写。</p></div>
+          <div class="pipeline-step"><b>02</b><strong>版本化存储</strong><p>保留原始数据和每次变更，支持回溯。</p></div>
+          <div class="pipeline-step"><b>03</b><strong>解析</strong><p>处理 Schema、嵌套结构、OCR 和多模态识别。</p></div>
+          <div class="pipeline-step"><b>04</b><strong>清洗映射</strong><p>去重、校验、拆宽表，建立小而聚焦的实体表。</p></div>
+          <div class="pipeline-step"><b>05</b><strong>对象化</strong><p>把表、行、列和外键映射为类型、对象、属性和关系。</p></div>
+        </div>
+
+        <div class="data-paths">
+          <article class="card">
+            <span class="card-label">结构化</span>
+            <h3>CSV / Database</h3>
+            <p>推断字段类型，再过滤异常值、处理缺失值并形成干净表。</p>
+            <span class="code-line">raw_flights → clean_flights</span>
+          </article>
+          <article class="card">
+            <span class="card-label">半结构化</span>
+            <h3>JSON / XML</h3>
+            <p>展开嵌套数组，把订单、乘客和多段行程拆为可关联的表。</p>
+            <span class="code-line">booking.json → passengers + segments</span>
+          </article>
+          <article class="card">
+            <span class="card-label">非结构化</span>
+            <h3>PDF / Image / Audio</h3>
+            <p>OCR 与视觉理解先转为可读文本，再提取业务字段。人工复核不能省。</p>
+            <span class="code-line">report.pdf → markdown → maintenance</span>
+          </article>
+        </div>
+
+        <div class="callout">
+          <h3>Media Reference 要保留原始证据</h3>
+          <p>结构化后的每一行都应继续指向原始 PDF、图片或音频。当审计人问“这个结论从哪里来”时，系统可以回到原始页和原始版本。</p>
+        </div>
+
+        <h3>增量更新要同时贯通三层</h3>
+        <div class="incremental">
+          <div><strong>Source sync</strong><p>只拉取新增和已变更的数据。</p></div>
+          <div><strong>Pipeline</strong><p>处理变更行，对可变状态去重并保留最新版本。</p></div>
+          <div><strong>Ontology index</strong><p>只刷新已改变的对象和关系。</p></div>
+        </div>
+        <p>批处理与用户实时 Action 之间还有时差。如果不定义合并与冲突规则，系统会同时看到新旧两个状态。</p>
+      </section>
+
+      <section class="content-section" id="operating-layer">
+        <p class="section-kicker">05 / Operational layer</p>
+        <h2>把“查数据”升级为“做业务”</h2>
+        <p class="lead">
+          一张干净表可以映射为一种 Object Type，每行是一个 Object，每列是 Property，表与表的关联是 Link。这一层能让系统看懂业务世界。Function 和 Action 则让系统可以计算并作用于这个世界。
+        </p>
+
+        <div class="operating-grid">
+          <article class="operating-card">
+            <span class="mono">01 / Object</span>
+            <h3>业务对象</h3>
+            <p>订单、承运商、仓库、客户和设备都应有稳定标识、属性与版本。</p>
+          </article>
+          <article class="operating-card">
+            <span class="mono">02 / Link</span>
+            <h3>关系与追溯路径</h3>
+            <p>Shipment 连到 Order，Order 连到 Customer。Agent 可以沿着关系查找 VIP 客户的延误订单。</p>
+          </article>
+          <article class="operating-card">
+            <span class="mono">03 / Function</span>
+            <h3>确定性业务计算</h3>
+            <p>延误风险应由函数读取 90 天历史、承运商履约率和天气，而不是让 LLM 凭感觉判断。</p>
+          </article>
+          <article class="operating-card">
+            <span class="mono">04 / Action</span>
+            <h3>受控的业务变更</h3>
+            <p>改派承运商、更新 ETA 或创建异常 Case。每个 Action 都有参数、规则、前置条件和副作用。</p>
+          </article>
+        </div>
+
+        <div class="guardrail">
+          <strong>LLM 负责理解意图、选择函数和解释结果。</strong>
+          <p>专业规则、数学计算和约束交给 Function。高风险变更交给带确认的 Action。这样才能把自然语言的灵活性与业务执行的确定性分开。</p>
+        </div>
+      </section>
+
+      <section class="content-section" id="agent-context">
+        <p class="section-kicker">06 / Agent interaction</p>
+        <h2>Context 是必须知道，Query 是允许探索</h2>
+        <p class="lead">
+          Agent 不应扫描全部 Schema，也不应直连底层数据库。每轮对话先注入已配置的背景，再让 Agent 在授权范围内查询对象和关系。
+        </p>
+
+        <div class="context-query">
+          <div class="context-box">
+            <span class="card-label">Retrieval Context</span>
+            <h3>每轮都需要的确定信息</h3>
+            <ul>
+              <li>当前选中的仓库、订单和客户</li>
+              <li>今日 KPI、当前角色和权限范围</li>
+              <li>Document Context 返回的合同片段</li>
+              <li>Function-backed Context 汇总的客户 360 信息</li>
+            </ul>
+          </div>
+          <div class="versus">VS</div>
+          <div class="query-box">
+            <span class="card-label">Object Query</span>
+            <h3>根据问题临时探索</h3>
+            <ul>
+              <li>过滤华南仓的延误优先订单</li>
+              <li>沿 Link 追到客户与承运商</li>
+              <li>对区域、状态和时间窗做聚合</li>
+              <li>将关系追溯层数限制在可控范围</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout">
+          <h3>一条实用规则</h3>
+          <p>确定性内容走 Context，允许 Agent 自主探索的内容走 Query。Context 塞得太满会浪费 Token 并干扰模型，Query 配得太窄则会让 Agent 查不到该有的信息。</p>
+        </div>
+
+        <h3>Agent 与 Ontology 的五层交互</h3>
+        <div class="layer-stack">
+          <div class="layer"><b>Context layer</b><p>系统确定性准备当前对象、文档片段、权限和必要背景。</p></div>
+          <div class="layer"><b>Query layer</b><p>Agent 在许可范围内过滤、聚合、检查并沿关系继续追查。</p></div>
+          <div class="layer"><b>Logic layer</b><p>调用封装好的 Function 执行风险计算、优化和业务规则。</p></div>
+          <div class="layer"><b>Action layer</b><p>产生受控变更。高风险操作要求用户确认，低风险操作可按政策自动执行。</p></div>
+          <div class="layer governance"><b>Governance</b><p>权限、数据范围、工具白名单、确认与审计贯穿前四层。</p></div>
+        </div>
+      </section>
+
+      <section class="content-section" id="governance">
+        <p class="section-kicker">07 / Governance</p>
+        <h2>防幻觉不是加一句“不要编造”</h2>
+        <p class="lead">
+          对于企业 Agent，更可靠的办法是从结构上限制它能看到什么、能查什么、能调什么函数、能执行哪些动作。没有财务对象、没有财务权限、也没有相关函数时，Agent 应该根本接触不到营收数据。
+        </p>
+
+        <div class="permission-demo">
+          <article class="permission-card">
+            <span class="card-label">调度员</span>
+            <h3>只管三条线路</h3>
+            <ul>
+              <li>查看三条线路的 Shipment</li>
+              <li>计算延误风险并更新 ETA</li>
+              <li class="denied">不能查看利润率</li>
+              <li class="denied">不能改派承运商</li>
+            </ul>
+          </article>
+          <article class="permission-card">
+            <span class="card-label">区域经理</span>
+            <h3>负责整个华南区</h3>
+            <ul>
+              <li>查看全区概览与所有线路</li>
+              <li>查询承运商绩效和利润</li>
+              <li>确认高风险调度动作</li>
+              <li>查看审计日志与操作结果</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="guardrail">
+          <strong>最小权限要同时作用于数据、查询、函数和 Action。</strong>
+          <p>每次调用记录谁在什么时间查了哪些对象、调用了什么函数、请求了什么 Action、用户是否确认以及最终结果。</p>
+        </div>
+
+        <p style="margin-top: 26px;">外部 Agent 也应该只通过受治理的 MCP 或工具接口访问 Ontology。修改 Object Type 定义、读取对象数据和执行 Action 属于不同权限面，不应由一个凭证全部打通。</p>
+      </section>
+
+      <section class="content-section" id="playbook">
+        <p class="section-kicker">08 / Delivery playbook</p>
+        <h2>一个可以真正开工的落地清单</h2>
+        <p class="lead">
+          Ontology 项目不应从“建全公司知识图谱”开始。先选一个决策频率高、数据可取、动作边界清楚的业务问题，再向外扩。
+        </p>
+
+        <ol class="playbook">
+          <li><div><h3>把业务问题写成可验收句子</h3><p>例如“在 30 秒内找到华南仓的高风险优先订单，给出原因和可选处理方案”。</p></div></li>
+          <li><div><h3>圈定最小对象与关系</h3><p>只建与该决策直接相关的 Shipment、Order、Customer、Carrier 和 Warehouse。</p></div></li>
+          <li><div><h3>建立原始数据到对象的映射</h3><p>宽表先拆分，非结构化材料先解析，每个结果都保留证据指针。</p></div></li>
+          <li><div><h3>把专业判断写进 Function</h3><p>明确输入、计算方法、输出 Schema、缺失数据处理和回归样本。</p></div></li>
+          <li><div><h3>为 Action 设定风险等级</h3><p>高风险操作要展示影响、成本和代替方案，用户确认后再执行。</p></div></li>
+          <li><div><h3>用真实记录做端到端验收</h3><p>验证对象映射、关系追溯、函数结果、权限拒绝、确认流程、写回和审计日志。</p></div></li>
+        </ol>
+
+        <h3 style="margin-top: 38px;">Definition of Done</h3>
+        <div class="definition-done">
+          <div>每个关键字段都能追溯到原始记录。</div>
+          <div>实体别名、关系和版本有回归样本。</div>
+          <div>Function 对同一输入给出稳定、可解释结果。</div>
+          <div>越权查询在数据层就被拒绝。</div>
+          <div>高风险 Action 未确认时不会执行。</div>
+          <div>所有查询、函数和变更都能在审计日志中还原。</div>
+        </div>
+      </section>
+
+      <section class="content-section" id="source">
+        <p class="section-kicker">09 / Source & method</p>
+        <h2>来源和蒸馏方法</h2>
+        <div class="source-box">
+          <p>本页基于小红书视频 <a href="https://www.xiaohongshu.com/explore/6a95742a000000001e014102?xsec_token=CBwXPWxbh-vH6EMa7vxw0Lk-JJdAj7ZEIiGL4_sjLxPhk=&amp;xsec_source=app_share" target="_blank" rel="noreferrer">《FDE 必看 Ontology 落地技术细节》</a> 整理。视频时长约 48 分钟，画面为讲解与网页长文录屏。</p>
+          <p>处理时使用了中文字幕、画面关键帧和页面文字交叉校正。正文按主题重写，删除口语重复，不包含完整字幕或原页复制。</p>
+          <dl>
+            <dt>已修正</dt><dd>将字幕中的 palenteer、red、PTF 等明显识别错误按语义修正为 Palantir、RAG、PDF。</dd>
+            <dt>内容属性</dt><dd>学习型蒸馏与工程化重写，非 Palantir 官方文档，也不代表原视频作者的逐字表述。</dd>
+            <dt>使用建议</dt><dd>用于建立方法框架。与具体产品 API、授权模型或 MCP 能力有关的实施，仍应回到相应官方文档核对。</dd>
+          </dl>
+        </div>
+      </section>
+
+      <footer>
+        <p>Ontology in Practice. 一份用于企业 AI 项目设计与交付的学习型文档。</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    const progressBar = document.querySelector('#progress-bar');
+    const sections = [...document.querySelectorAll('main section[id]')];
+    const navLinks = [...document.querySelectorAll('.side-nav a[href^="#"]')];
+
+    const updateProgress = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+      progressBar.style.width = `${Math.min(1, Math.max(0, progress)) * 100}%`;
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (!visible) return;
+
+      for (const link of navLinks) {
+        const current = link.getAttribute('href') === `#${visible.target.id}`;
+        if (current) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      }
+    }, { rootMargin: '-20% 0px -64% 0px', threshold: [0, 0.2, 0.6] });
+
+    sections.forEach((section) => sectionObserver.observe(section));
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+  </script>
+</body>
+</html>
